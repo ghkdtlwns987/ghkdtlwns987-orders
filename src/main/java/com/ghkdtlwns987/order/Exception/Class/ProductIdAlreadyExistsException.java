@@ -5,7 +5,6 @@ import com.ghkdtlwns987.order.Exception.ErrorCode;
 
 public class ProductIdAlreadyExistsException extends BuisinessException {
     public ProductIdAlreadyExistsException(){
-        super(ErrorCode.ORDER_ID_ALREADY_EXISTS);
+        super(ErrorCode.PRODUCT_ID_ALREADY_EXISTS);
     }
-
 }

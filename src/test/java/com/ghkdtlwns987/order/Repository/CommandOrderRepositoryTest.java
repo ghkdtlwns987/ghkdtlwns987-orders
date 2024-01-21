@@ -2,23 +2,25 @@ package com.ghkdtlwns987.order.Repository;
 
 import com.ghkdtlwns987.order.Dto.OrderRequestDto;
 import com.ghkdtlwns987.order.Entity.Order;
+import com.ghkdtlwns987.order.Persistent.JpaOrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.doReturn;
 
 @DataJpaTest
 public class CommandOrderRepositoryTest {
     @Autowired
-    CommandOrderRepository commandOrderRepository;
+    JpaOrderRepository commandOrderRepository;
 
-    private final String orderId1 = "CATALOG-0001";
-    private final String orderId2 = "CATALOG-0002";
-    private final String orderId3 = "CATALOG-0003";
+    private final String productId1 = "CATALOG-0001";
+    private final String productId2 = "CATALOG-0002";
+    private final String productId3 = "CATALOG-0003";
 
     private final Integer qty = 5;
     private final Integer unitPrice = 1000;
@@ -34,18 +36,18 @@ public class CommandOrderRepositoryTest {
     @BeforeEach
     void setUp(){
         orderRequestDto1 = new OrderRequestDto(
-                orderId1,
+                productId1,
                 qty,
                 unitPrice
         );
 
         orderRequestDto2 = new OrderRequestDto(
-                orderId2,
+                productId2,
                 qty,
                 unitPrice
         );
         orderRequestDto3 = new OrderRequestDto(
-                orderId3,
+                productId3,
                 qty,
                 unitPrice
         );
@@ -57,42 +59,27 @@ public class CommandOrderRepositoryTest {
     @Test
     void 주문등록_성공_테스트() throws Exception{
         // given
-        Order savedOrder = commandOrderRepository.save(order1);
-
-        // then
-        assertThat(savedOrder.getOrderId()).isEqualTo(order1.getOrderId());
-        assertThat(savedOrder.getProductId()).isEqualTo(order1.getProductId());
-        assertThat(savedOrder.getQty()).isEqualTo(order1.getQty());
-        assertThat(savedOrder.getTotalPrice()).isEqualTo(order1.getTotalPrice());
-        assertThat(savedOrder.getUnitPrice()).isEqualTo(order1.getUnitPrice());
-    }
-
-    @Test
-    void 주문_검색_실패_orderId가_존재하지_않음() throws Exception{
-        Order savedOrder1 = commandOrderRepository.save(order1);
-        Order savedOrder2 = commandOrderRepository.save(order2);
-        Order savedOrder3 = commandOrderRepository.save(order3);
-
-        Order foundOrder = commandOrderRepository.findOrderByOrderId("CATALOG-0010");
-
-
-
-    }
-    @Test
-    void 주문_검색_테스트() throws Exception{
-        // given
         Order savedOrder1 = commandOrderRepository.save(order1);
         Order savedOrder2 = commandOrderRepository.save(order2);
         Order savedOrder3 = commandOrderRepository.save(order3);
 
         // then
-        Order foundOrder = commandOrderRepository.findOrderByOrderId(savedOrder2.getOrderId());
+        assertThat(savedOrder1.getOrderId()).isEqualTo(order1.getOrderId());
+        assertThat(savedOrder1.getProductId()).isEqualTo(order1.getProductId());
+        assertThat(savedOrder1.getQty()).isEqualTo(order1.getQty());
+        assertThat(savedOrder1.getTotalPrice()).isEqualTo(order1.getTotalPrice());
+        assertThat(savedOrder1.getUnitPrice()).isEqualTo(order1.getUnitPrice());
 
-        assertThat(foundOrder.getOrderId()).isEqualTo(order2.getOrderId());
-        assertThat(foundOrder.getProductId()).isEqualTo(order2.getProductId());
-        assertThat(foundOrder.getQty()).isEqualTo(order2.getQty());
-        assertThat(foundOrder.getTotalPrice()).isEqualTo(order2.getTotalPrice());
-        assertThat(foundOrder.getUnitPrice()).isEqualTo(order2.getUnitPrice());
+        assertThat(savedOrder2.getOrderId()).isEqualTo(order2.getOrderId());
+        assertThat(savedOrder2.getProductId()).isEqualTo(order2.getProductId());
+        assertThat(savedOrder2.getQty()).isEqualTo(order2.getQty());
+        assertThat(savedOrder2.getTotalPrice()).isEqualTo(order2.getTotalPrice());
+        assertThat(savedOrder2.getUnitPrice()).isEqualTo(order2.getUnitPrice());
+
+        assertThat(savedOrder3.getOrderId()).isEqualTo(order3.getOrderId());
+        assertThat(savedOrder3.getProductId()).isEqualTo(order3.getProductId());
+        assertThat(savedOrder3.getQty()).isEqualTo(order3.getQty());
+        assertThat(savedOrder3.getTotalPrice()).isEqualTo(order3.getTotalPrice());
+        assertThat(savedOrder3.getUnitPrice()).isEqualTo(order3.getUnitPrice());
     }
-
 }

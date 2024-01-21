@@ -6,9 +6,11 @@ import com.ghkdtlwns987.order.Entity.Order;
 
 import java.util.List;
 
-public interface OrderService {
+public interface QueryOrderService {
     List<OrderResponseDto> getOrderByUserId(String userId) throws Exception;
 
-    OrderResponseDto getOrderByOrderId(String orderId) throws Exception;
-    OrderResponseDto createOrder(String userID, OrderRequestDto orderRequestDto) throws Exception;
+    Order getOrderByProductId(String orderId) throws Exception;
+
+    boolean checkProductIdIsExists(String productId);
+
 }
