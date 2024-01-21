@@ -19,13 +19,13 @@ public class OrderController
     private final OrderService orderService;
 
     @PostMapping("/{userId}/orders")
-    public ResponseEntity<OrderResponseDto> createOrder(@PathVariable String userId, @RequestBody OrderRequestDto request){
+    public ResponseEntity<OrderResponseDto> createOrder(@PathVariable String userId, @RequestBody OrderRequestDto request) throws Exception {
         OrderResponseDto response = orderService.createOrder(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{userId}/orders")
-    public ResponseEntity<List<OrderResponseDto>> getOrders(@PathVariable String userId){
+    public ResponseEntity<List<OrderResponseDto>> getOrders(@PathVariable String userId) throws Exception {
         List<OrderResponseDto> response = orderService.getOrderByUserId(userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

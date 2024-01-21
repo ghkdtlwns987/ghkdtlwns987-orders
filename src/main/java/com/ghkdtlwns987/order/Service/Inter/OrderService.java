@@ -7,8 +7,8 @@ import com.ghkdtlwns987.order.Entity.Order;
 import java.util.List;
 
 public interface OrderService {
-    List<OrderResponseDto> getOrderByUserId(String userId);
+    List<OrderResponseDto> getOrderByUserId(String userId) throws Exception;
 
-    OrderResponseDto getOrderByOrderId(String orderId);
-    OrderResponseDto createOrder(String userID, OrderRequestDto orderRequestDto);
+    OrderResponseDto getOrderByOrderId(String orderId) throws Exception;
+    OrderResponseDto createOrder(String userID, OrderRequestDto orderRequestDto) throws Exception;
 }
