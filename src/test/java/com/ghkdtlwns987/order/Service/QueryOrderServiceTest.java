@@ -2,6 +2,7 @@ package com.ghkdtlwns987.order.Service;
 
 import com.ghkdtlwns987.order.Dto.OrderRequestDto;
 import com.ghkdtlwns987.order.Entity.Order;
+import com.ghkdtlwns987.order.Exception.ClientException;
 import com.ghkdtlwns987.order.Repository.QueryOrderRepository;
 import com.ghkdtlwns987.order.Service.Impl.QueryOrderServiceImpl;
 import com.ghkdtlwns987.order.Service.Inter.QueryOrderService;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -99,8 +101,15 @@ public class QueryOrderServiceTest {
 
     @Test
     void userId가_없어_Order정보_획득_실패(){
-        doReturn(true).when(queryOrderService).checkProductIdIsExists(productId1);
+        doReturn(false).when(queryOrderService).checkProductIdIsExists(productId1);
         final boolean result = queryOrderService.checkProductIdIsExists(productId1);
-        assertThat(result).isEqualTo(true);
+        assertThat(result).isEqualTo(false);
+    }
+
+    @Test
+    void userId가_유효하지않아_Order_검색_실패(){
+        final String invalid_product_Id = "CATALOG-00444";
+        when(queryOrderService.getOrderByProductId(invalid_product_Id)).thenReturn(null);
+        assertThrows(ClientException.class, () -> queryOrderService.getOrderByProductId(invalid_product_Id));
     }
 }
