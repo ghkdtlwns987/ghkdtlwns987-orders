@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -36,7 +36,7 @@ public class QueryDslQueryOrderRepository implements QueryOrderRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public Iterable<Order> findOrderByUserId(String userId) {
+    public List<Order> findOrderByUserId(String userId) {
         QOrder qOrder = QOrder.order;
         return jpaQueryFactory.selectFrom(qOrder)
                 .where(qOrder.userId.eq(userId))

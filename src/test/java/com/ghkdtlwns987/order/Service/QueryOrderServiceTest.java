@@ -1,26 +1,32 @@
 package com.ghkdtlwns987.order.Service;
 
 import com.ghkdtlwns987.order.Dto.OrderRequestDto;
+import com.ghkdtlwns987.order.Dto.OrderResponseDto;
 import com.ghkdtlwns987.order.Entity.Order;
 import com.ghkdtlwns987.order.Exception.ClientException;
+import com.ghkdtlwns987.order.Persistent.JpaOrderRepository;
 import com.ghkdtlwns987.order.Repository.QueryOrderRepository;
 import com.ghkdtlwns987.order.Service.Impl.QueryOrderServiceImpl;
 import com.ghkdtlwns987.order.Service.Inter.QueryOrderService;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EntityManager;
+import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.UUID;
+import javax.swing.text.html.Option;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @EntityListeners(AuditingEntityListener.class)
@@ -35,10 +41,7 @@ public class QueryOrderServiceTest {
     private final Integer unitPrice = 1000;
     private final String userId = "c11b7d71-5b23-4a3d-a867-3e97cc8624e3";
 
-    @Mock
     private QueryOrderRepository queryOrderRepository;
-    @InjectMocks
-    @Spy
     private QueryOrderServiceImpl queryOrderService;
 
     Order order1;
@@ -48,10 +51,10 @@ public class QueryOrderServiceTest {
     OrderRequestDto orderRequestDto2;
     OrderRequestDto orderRequestDto3;
 
-
     @BeforeEach
     void setUp(){
-        MockitoAnnotations.initMocks(this);
+        queryOrderRepository = Mockito.mock(QueryOrderRepository.class);
+        queryOrderService = new QueryOrderServiceImpl(queryOrderRepository);
 
         orderRequestDto1 = new OrderRequestDto(
                 productId1,
@@ -99,17 +102,81 @@ public class QueryOrderServiceTest {
                 .build();
     }
 
+
     @Test
-    void userId가_없어_Order정보_획득_실패(){
-        doReturn(false).when(queryOrderService).checkProductIdIsExists(productId1);
-        final boolean result = queryOrderService.checkProductIdIsExists(productId1);
-        assertThat(result).isEqualTo(false);
+    void userId를_기반으로_Order_검색_실패(){
+        // given
+        final String invalid_userId = "invalid-user-id-1512-325";
+        when(queryOrderRepository.findOrderByUserId(invalid_userId))
+                .thenThrow(ClientException.class);
+
+        // when then
+        assertThatThrownBy(() -> queryOrderService.getOrderByUserId(invalid_userId))
+                .isInstanceOf(ClientException.class);
     }
 
     @Test
-    void userId가_유효하지않아_Order_검색_실패(){
+    void userId를_기반으로_Order_검색_성공(){
+        // given
+        List<Order> orders = new ArrayList<>();
+        orders.add(order1);
+        orders.add(order2);
+        orders.add(order3);
+
+        when(queryOrderRepository.findOrderByUserId(userId)).thenReturn(orders);
+
+        // when
+        List<OrderResponseDto> result = queryOrderService.getOrderByUserId(userId);
+
+        // then
+        assertEquals(orders.size(), result.size());
+    }
+    @Test
+    void productId가_존재하지_않아_Order_검색_실패(){
+        // given
         final String invalid_product_Id = "CATALOG-00444";
-        when(queryOrderService.getOrderByProductId(invalid_product_Id)).thenReturn(null);
-        assertThrows(ClientException.class, () -> queryOrderService.getOrderByProductId(invalid_product_Id));
+        when(queryOrderRepository.findOrderByProductId(invalid_product_Id))
+                .thenThrow(ClientException.class);
+
+        // when then
+        assertThatThrownBy(() -> queryOrderService.getOrderByProductId(invalid_product_Id))
+                .isInstanceOf(ClientException.class);
+    }
+
+    @Test
+    void productId가_존재하지_않아_Order_검색_성공(){
+        // given
+        Order order;
+        when(queryOrderRepository.findOrderByProductId(productId1)).thenReturn(Optional.of(order1));
+
+        // when
+        order = queryOrderService.getOrderByProductId(productId1);
+
+        // then
+        assertThat(order.getProductId()).isEqualTo(order1.getProductId());
+    }
+
+    @Test
+    void productId_존재_검색_실패(){
+        // given
+        final String invalid_productId = "invalid-product-id";
+        when(queryOrderRepository.existsOrderByProductId(invalid_productId)).thenReturn(false);
+
+        // when
+        boolean result = queryOrderService.orderExistsByProductId(invalid_productId);
+
+        // then
+        assertThat(result).isEqualTo(false);
+    }
+    @Test
+    void productId_존재_검색_성공(){
+        // given
+        when(queryOrderRepository.existsOrderByProductId(productId1)).thenReturn(true);
+
+        // when
+        boolean result = queryOrderService.orderExistsByProductId(productId1);
+
+        // then
+        assertThat(result).isEqualTo(true);
     }
 }

@@ -46,7 +46,7 @@ public class QueryOrderServiceImpl implements QueryOrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean checkProductIdIsExists(String productId) {
+    public boolean orderExistsByProductId(String productId) {
         return queryOrderRepository.existsOrderByProductId(productId);
     }
 }

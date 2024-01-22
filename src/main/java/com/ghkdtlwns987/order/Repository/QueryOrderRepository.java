@@ -2,6 +2,7 @@ package com.ghkdtlwns987.order.Repository;
 
 import com.ghkdtlwns987.order.Entity.Order;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface QueryOrderRepository {
@@ -32,6 +33,6 @@ public interface QueryOrderRepository {
      * @param userId
      * @return Iterable<Order>
      */
-    Iterable<Order> findOrderByUserId(String userId);
+    List<Order> findOrderByUserId(String userId);
 
 }

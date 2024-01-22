@@ -20,7 +20,7 @@ public class CommandOrderServiceImpl implements CommandOrderService {
     @Override
     @Transactional
     public OrderResponseDto createOrder(String userId, OrderRequestDto orderRequestDto) throws Exception{
-        if(checkOrderIdExists(orderRequestDto)){
+        if(productIdAlreadyExists(orderRequestDto)){
             throw new ProductIdAlreadyExistsException();
         }
         Order order = orderRequestDto.toEntity(userId);
@@ -36,8 +36,8 @@ public class CommandOrderServiceImpl implements CommandOrderService {
     }
 
 
-    private boolean checkOrderIdExists(OrderRequestDto orderRequestDto){
-        if(queryOrderService.checkProductIdIsExists(orderRequestDto.getProductId())){
+    private boolean productIdAlreadyExists(OrderRequestDto orderRequestDto){
+        if(queryOrderService.orderExistsByProductId(orderRequestDto.getProductId())){
             return true;
         }
         return false;

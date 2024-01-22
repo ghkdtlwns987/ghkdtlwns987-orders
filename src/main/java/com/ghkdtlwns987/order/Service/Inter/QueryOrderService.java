@@ -11,6 +11,6 @@ public interface QueryOrderService {
 
     Order getOrderByProductId(String orderId) throws Exception;
 
-    boolean checkProductIdIsExists(String productId);
+    boolean orderExistsByProductId(String productId);
 
 }
