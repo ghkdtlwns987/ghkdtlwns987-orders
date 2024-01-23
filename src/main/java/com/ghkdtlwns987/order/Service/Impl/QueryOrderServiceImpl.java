@@ -49,12 +49,4 @@ public class QueryOrderServiceImpl implements QueryOrderService {
     public boolean orderExistsByProductId(String productId) {
         return queryOrderRepository.existsOrderByProductId(productId);
     }
-
-    @Override
-    public List<OrderResponseDto> getOrderInfo(String userId) {
-        List<Order> orderList = queryOrderRepository.findOrderByUserId(userId);
-        return orderList.stream()
-                .map(OrderResponseDto::fromEntity)
-                .toList();
-    }
 }

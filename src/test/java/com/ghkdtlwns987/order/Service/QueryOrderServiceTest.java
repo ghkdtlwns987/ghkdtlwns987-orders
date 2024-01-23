@@ -19,6 +19,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -33,7 +34,8 @@ public class QueryOrderServiceTest {
     private final Integer qty = 5;
     private final Integer unitPrice = 1000;
     private final String userId = "c11b7d71-5b23-4a3d-a867-3e97cc8624e3";
-
+    private final String orderId1 = UUID.randomUUID().toString();
+    private final String orderId2 = UUID.randomUUID().toString();
     private QueryOrderRepository queryOrderRepository;
     private QueryOrderServiceImpl queryOrderService;
 
@@ -73,7 +75,7 @@ public class QueryOrderServiceTest {
                 .unitPrice(unitPrice)
                 .totalPrice(1000)
                 .userId(userId)
-                .orderId(UUID.randomUUID().toString())
+                .orderId(orderId1)
                 .build();
         order2 = Order.builder()
                 .Id(2L)
@@ -82,34 +84,23 @@ public class QueryOrderServiceTest {
                 .unitPrice(unitPrice)
                 .totalPrice(1000)
                 .userId(userId)
-                .orderId(UUID.randomUUID().toString())
-                .build();
-        order3 = Order.builder()
-                .Id(3L)
-                .productId(productId3)
-                .qty(qty)
-                .unitPrice(unitPrice)
-                .totalPrice(1000)
-                .userId(userId)
-                .orderId(UUID.randomUUID().toString())
+                .orderId(orderId2)
                 .build();
     }
 
     @Test
     void userId가_존재하지_않으면_빈_배열_반환(){
         // given
-        OrderResponseDto orderResponseDto = new OrderResponseDto();
-        List<OrderResponseDto> orderResponse = Arrays.asList(
-                orderResponseDto
-        );
-        when(queryOrderService.getOrderInfo(userId)).thenReturn(orderResponse);
+        List<Order> orders = Arrays.asList();
+        List<OrderResponseDto> orderResponse = Arrays.asList();
+        when(queryOrderRepository.findOrderByUserId(userId)).thenReturn(orders);
 
         // when
-        List<OrderResponseDto> result = queryOrderService.getOrderInfo(userId);
+        List<OrderResponseDto> result = queryOrderService.getOrderByUserId(userId);
         assertEquals(orderResponse.size(), result.size());
 
         // then
-        verify(queryOrderService, times(1)).getOrderByUserId(userId);
+        verify(queryOrderRepository, times(1)).findOrderByUserId(userId);
     }
 
     @Test
@@ -127,10 +118,7 @@ public class QueryOrderServiceTest {
     @Test
     void userId를_기반으로_Order_검색_성공(){
         // given
-        List<Order> orders = new ArrayList<>();
-        orders.add(order1);
-        orders.add(order2);
-        orders.add(order3);
+        List<Order> orders = Arrays.asList(order1, order2);
 
         when(queryOrderRepository.findOrderByUserId(userId)).thenReturn(orders);
 
@@ -138,7 +126,22 @@ public class QueryOrderServiceTest {
         List<OrderResponseDto> result = queryOrderService.getOrderByUserId(userId);
 
         // then
-        assertEquals(orders.size(), result.size());
+        assertThat(result)
+                .isNotEmpty()
+                .hasSize(2)
+                .hasSameSizeAs(orders)
+                .extracting(
+                        OrderResponseDto::getProductId,
+                        OrderResponseDto::getQty,
+                        OrderResponseDto::getUnitPrice,
+                        OrderResponseDto::getTotalPrice,
+                        OrderResponseDto::getUserId,
+                        OrderResponseDto::getOrderId
+                )
+                .containsExactly(
+                        tuple(productId1, qty, unitPrice, 1000, userId, orderId1),
+                        tuple(productId2, qty, unitPrice, 1000, userId, orderId2)
+                );
     }
     @Test
     void productId가_존재하지_않아_Order_검색_실패(){
@@ -190,63 +193,35 @@ public class QueryOrderServiceTest {
     }
 
     @Test
-    void 주문_조회_성공() throws Exception {
-        final String orderId = UUID.randomUUID().toString();
-        LocalDateTime orderedAt = LocalDateTime.now();
-        OrderResponseDto orderResponseDto1 = new OrderResponseDto(
-                productId1,
-                qty,
-                unitPrice,
-                1000,
-                userId,
-                orderId,
-                orderedAt
-        );
-        OrderResponseDto orderResponseDto2 = new OrderResponseDto(
-                productId2,
-                qty,
-                unitPrice,
-                1000,
-                userId,
-                orderId,
-                orderedAt
-        );
-
+    void 주문_조회_성공() {
         // given
-        List<OrderResponseDto> orderResponse = Arrays.asList(
-                orderResponseDto1,
-                orderResponseDto2
-        );
-
         List<Order> orders = Arrays.asList(
                 order1,
                 order2
         );
 
-        when(queryOrderService.getOrderInfo(userId)).thenReturn(orderResponse);
+        when(queryOrderRepository.findOrderByUserId(userId)).thenReturn(orders);
 
         // when
-        List<OrderResponseDto> result = queryOrderService.getOrderInfo(userId);
+        List<OrderResponseDto> result = queryOrderService.getOrderByUserId(userId);
 
         // then
-        assertThat(result).hasSize(2);
+        assertThat(result)
+                .isNotEmpty()
+                .hasSize(2)
+                .extracting(
+                        OrderResponseDto::getProductId,
+                        OrderResponseDto::getQty,
+                        OrderResponseDto::getUnitPrice,
+                        OrderResponseDto::getTotalPrice,
+                        OrderResponseDto::getUserId,
+                        OrderResponseDto::getOrderId
+                )
+                .containsExactly(
+                        tuple(productId1, qty, unitPrice, 1000, userId, orderId1),
+                        tuple(productId2, qty, unitPrice, 1000, userId, orderId2)
+                );
 
-        assertThat(result.get(0).getProductId()).isEqualTo(orderResponseDto1.getProductId());
-        assertThat(result.get(0).getQty()).isEqualTo(orderResponseDto1.getQty());
-        assertThat(result.get(0).getUnitPrice()).isEqualTo(orderResponseDto1.getUnitPrice());
-        assertThat(result.get(0).getTotalPrice()).isEqualTo(orderResponseDto1.getTotalPrice());
-        assertThat(result.get(0).getUserId()).isEqualTo(orderResponseDto1.getUserId());
-        assertThat(result.get(0).getOrderId()).isEqualTo(orderResponseDto1.getOrderId());
-        assertThat(result.get(0).getOrderedAt()).isEqualTo(orderResponseDto1.getOrderedAt());
-
-        assertThat(result.get(1).getProductId()).isEqualTo(orderResponseDto2.getProductId());
-        assertThat(result.get(1).getQty()).isEqualTo(orderResponseDto2.getQty());
-        assertThat(result.get(1).getUnitPrice()).isEqualTo(orderResponseDto2.getUnitPrice());
-        assertThat(result.get(1).getTotalPrice()).isEqualTo(orderResponseDto2.getTotalPrice());
-        assertThat(result.get(1).getUserId()).isEqualTo(orderResponseDto2.getUserId());
-        assertThat(result.get(1).getOrderId()).isEqualTo(orderResponseDto2.getOrderId());
-        assertThat(result.get(1).getOrderedAt()).isEqualTo(orderResponseDto2.getOrderedAt());
-
-        verify(queryOrderService, times(1)).getOrderByUserId(userId);
+        verify(queryOrderRepository, times(1)).findOrderByUserId(userId);
     }
 }

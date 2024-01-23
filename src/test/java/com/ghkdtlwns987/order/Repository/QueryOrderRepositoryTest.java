@@ -1,11 +1,13 @@
 package com.ghkdtlwns987.order.Repository;
 
+import com.ghkdtlwns987.order.Dto.OrderResponseDto;
 import com.ghkdtlwns987.order.IntegrationTest;
 import com.ghkdtlwns987.order.Dto.OrderRequestDto;
 import com.ghkdtlwns987.order.Entity.Order;
 import com.ghkdtlwns987.order.Persistent.QueryDslQueryOrderRepository;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.AssertionsForClassTypes;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 @Transactional
 public class QueryOrderRepositoryTest extends IntegrationTest {
@@ -24,7 +28,10 @@ public class QueryOrderRepositoryTest extends IntegrationTest {
 
     private final Integer qty = 5;
     private final Integer unitPrice = 1000;
-    private final String userId = "c11b7d71-5b23-4a3d-a867-3e97cc8624e3";
+    private final String userId = UUID.randomUUID().toString();
+    private final String orderId1 = UUID.randomUUID().toString();
+    private final String orderId2 = UUID.randomUUID().toString();
+    private final String orderId3 = UUID.randomUUID().toString();
 
     Order order1;
     Order order2;
@@ -60,9 +67,33 @@ public class QueryOrderRepositoryTest extends IntegrationTest {
                 qty,
                 unitPrice
         );
-        order1 = orderRequestDto1.toEntity(userId);
-        order2 = orderRequestDto2.toEntity(userId);
-        order3 = orderRequestDto3.toEntity(userId);
+        order1 = Order.builder()
+                .Id(1L)
+                .productId(productId1)
+                .qty(qty)
+                .unitPrice(unitPrice)
+                .totalPrice(1000)
+                .userId(userId)
+                .orderId(orderId1)
+                .build();
+        order2 = Order.builder()
+                .Id(2L)
+                .productId(productId2)
+                .qty(qty)
+                .unitPrice(unitPrice)
+                .totalPrice(1000)
+                .userId(userId)
+                .orderId(orderId1)
+                .build();
+        order2 = Order.builder()
+                .Id(3L)
+                .productId(productId2)
+                .qty(qty)
+                .unitPrice(unitPrice)
+                .totalPrice(1000)
+                .userId(userId)
+                .orderId(orderId1)
+                .build();
 
         entityManager.persist(order1);
         entityManager.persist(order2);
@@ -98,27 +129,21 @@ public class QueryOrderRepositoryTest extends IntegrationTest {
         foundOrder.forEach(orderList::add);
 
         // then
-        assertThat(orderList).hasSize(3);
-
-        assertThat(orderList.get(0).getProductId()).isEqualTo(order1.getProductId());
-        assertThat(orderList.get(0).getQty()).isEqualTo(order1.getQty());
-        assertThat(orderList.get(0).getUnitPrice()).isEqualTo(order1.getUnitPrice());
-        assertThat(orderList.get(0).getTotalPrice()).isEqualTo(order1.getTotalPrice());
-        assertThat(orderList.get(0).getUserId()).isEqualTo(userId);
-        assertThat(orderList.get(0).getOrderId()).isEqualTo(order1.getOrderId());
-
-        assertThat(orderList.get(1).getProductId()).isEqualTo(order2.getProductId());
-        assertThat(orderList.get(1).getQty()).isEqualTo(order2.getQty());
-        assertThat(orderList.get(1).getUnitPrice()).isEqualTo(order2.getUnitPrice());
-        assertThat(orderList.get(1).getTotalPrice()).isEqualTo(order2.getTotalPrice());
-        assertThat(orderList.get(1).getUserId()).isEqualTo(userId);
-        assertThat(orderList.get(1).getOrderId()).isEqualTo(order2.getOrderId());
-
-        assertThat(orderList.get(2).getProductId()).isEqualTo(order3.getProductId());
-        assertThat(orderList.get(2).getQty()).isEqualTo(order3.getQty());
-        assertThat(orderList.get(2).getUnitPrice()).isEqualTo(order3.getUnitPrice());
-        assertThat(orderList.get(2).getTotalPrice()).isEqualTo(order3.getTotalPrice());
-        assertThat(orderList.get(2).getUserId()).isEqualTo(userId);
-        assertThat(orderList.get(2).getOrderId()).isEqualTo(order3.getOrderId());
+        assertThat(orderList)
+                .isNotEmpty()
+                .hasSize(3)
+                .extracting(
+                        Order::getProductId,
+                        Order::getQty,
+                        Order::getUnitPrice,
+                        Order::getTotalPrice,
+                        Order::getUserId,
+                        Order::getOrderId
+                )
+                .containsExactly(
+                        tuple(productId1, qty, unitPrice, 1000, userId, orderId1),
+                        tuple(productId2, qty, unitPrice, 1000, userId, orderId2),
+                        tuple(productId3, qty, unitPrice, 1000, userId, orderId3)
+                );
     }
 }
