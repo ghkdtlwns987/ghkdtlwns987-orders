@@ -30,7 +30,7 @@ public class QueryDslQueryOrderRepository implements QueryOrderRepository {
     public boolean existsOrderByUserId(String userId) {
         QOrder qOrder = QOrder.order;
         return Optional.ofNullable(jpaQueryFactory.selectFrom(qOrder)
-                .where(qOrder.userId.eq(qOrder.userId))
+                .where(qOrder.userId.eq(userId))
                 .fetchFirst()).isPresent();
     }
 

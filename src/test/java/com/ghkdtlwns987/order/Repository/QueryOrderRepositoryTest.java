@@ -83,7 +83,7 @@ public class QueryOrderRepositoryTest extends IntegrationTest {
         final String invalidUserId = "invalid-userId-1111";
 
         // when
-        Iterable<Order> foundOrder = queryOrderRepository.findOrderByUserId(invalidUserId);
+        List<Order> foundOrder = queryOrderRepository.findOrderByUserId(invalidUserId);
 
         List<Order> orderList = new ArrayList<>();
         foundOrder.forEach(orderList::add);
@@ -92,7 +92,7 @@ public class QueryOrderRepositoryTest extends IntegrationTest {
     @Test
     void 주문_검색_테스트() throws Exception{
         // when
-        Iterable<Order> foundOrder = queryOrderRepository.findOrderByUserId(userId);
+        List<Order> foundOrder = queryOrderRepository.findOrderByUserId(userId);
 
         List<Order> orderList = new ArrayList<>();
         foundOrder.forEach(orderList::add);

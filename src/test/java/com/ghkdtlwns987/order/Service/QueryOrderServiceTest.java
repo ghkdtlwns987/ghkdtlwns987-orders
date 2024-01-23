@@ -4,23 +4,16 @@ import com.ghkdtlwns987.order.Dto.OrderRequestDto;
 import com.ghkdtlwns987.order.Dto.OrderResponseDto;
 import com.ghkdtlwns987.order.Entity.Order;
 import com.ghkdtlwns987.order.Exception.ClientException;
-import com.ghkdtlwns987.order.Persistent.JpaOrderRepository;
 import com.ghkdtlwns987.order.Repository.QueryOrderRepository;
 import com.ghkdtlwns987.order.Service.Impl.QueryOrderServiceImpl;
-import com.ghkdtlwns987.order.Service.Inter.QueryOrderService;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EntityManager;
-import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -102,6 +95,22 @@ public class QueryOrderServiceTest {
                 .build();
     }
 
+    @Test
+    void userId가_존재하지_않으면_빈_배열_반환(){
+        // given
+        OrderResponseDto orderResponseDto = new OrderResponseDto();
+        List<OrderResponseDto> orderResponse = Arrays.asList(
+                orderResponseDto
+        );
+        when(queryOrderService.getOrderInfo(userId)).thenReturn(orderResponse);
+
+        // when
+        List<OrderResponseDto> result = queryOrderService.getOrderInfo(userId);
+        assertEquals(orderResponse.size(), result.size());
+
+        // then
+        verify(queryOrderService, times(1)).getOrderByUserId(userId);
+    }
 
     @Test
     void userId를_기반으로_Order_검색_실패(){
@@ -178,5 +187,66 @@ public class QueryOrderServiceTest {
 
         // then
         assertThat(result).isEqualTo(true);
+    }
+
+    @Test
+    void 주문_조회_성공() throws Exception {
+        final String orderId = UUID.randomUUID().toString();
+        LocalDateTime orderedAt = LocalDateTime.now();
+        OrderResponseDto orderResponseDto1 = new OrderResponseDto(
+                productId1,
+                qty,
+                unitPrice,
+                1000,
+                userId,
+                orderId,
+                orderedAt
+        );
+        OrderResponseDto orderResponseDto2 = new OrderResponseDto(
+                productId2,
+                qty,
+                unitPrice,
+                1000,
+                userId,
+                orderId,
+                orderedAt
+        );
+
+        // given
+        List<OrderResponseDto> orderResponse = Arrays.asList(
+                orderResponseDto1,
+                orderResponseDto2
+        );
+
+        List<Order> orders = Arrays.asList(
+                order1,
+                order2
+        );
+
+        when(queryOrderService.getOrderInfo(userId)).thenReturn(orderResponse);
+
+        // when
+        List<OrderResponseDto> result = queryOrderService.getOrderInfo(userId);
+
+        // then
+        assertThat(result).hasSize(2);
+
+        assertThat(result.get(0).getProductId()).isEqualTo(orderResponseDto1.getProductId());
+        assertThat(result.get(0).getQty()).isEqualTo(orderResponseDto1.getQty());
+        assertThat(result.get(0).getUnitPrice()).isEqualTo(orderResponseDto1.getUnitPrice());
+        assertThat(result.get(0).getTotalPrice()).isEqualTo(orderResponseDto1.getTotalPrice());
+        assertThat(result.get(0).getUserId()).isEqualTo(orderResponseDto1.getUserId());
+        assertThat(result.get(0).getOrderId()).isEqualTo(orderResponseDto1.getOrderId());
+        assertThat(result.get(0).getOrderedAt()).isEqualTo(orderResponseDto1.getOrderedAt());
+
+        assertThat(result.get(1).getProductId()).isEqualTo(orderResponseDto2.getProductId());
+        assertThat(result.get(1).getQty()).isEqualTo(orderResponseDto2.getQty());
+        assertThat(result.get(1).getUnitPrice()).isEqualTo(orderResponseDto2.getUnitPrice());
+        assertThat(result.get(1).getTotalPrice()).isEqualTo(orderResponseDto2.getTotalPrice());
+        assertThat(result.get(1).getUserId()).isEqualTo(orderResponseDto2.getUserId());
+        assertThat(result.get(1).getOrderId()).isEqualTo(orderResponseDto2.getOrderId());
+        assertThat(result.get(1).getOrderedAt()).isEqualTo(orderResponseDto2.getOrderedAt());
+
+        verify(queryOrderService, times(1)).getOrderByUserId(userId);
     }
 }

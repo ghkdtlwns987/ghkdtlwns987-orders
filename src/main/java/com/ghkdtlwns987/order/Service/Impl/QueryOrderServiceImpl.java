@@ -17,13 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class QueryOrderServiceImpl implements QueryOrderService {
     private final QueryOrderRepository queryOrderRepository;
     @Override
-    @Transactional(readOnly = true)
     public List<OrderResponseDto> getOrderByUserId(String userId) {
         Iterable<Order> orders = queryOrderRepository.findOrderByUserId(userId);
         List<Order> orderList = new ArrayList<>();
@@ -31,11 +32,10 @@ public class QueryOrderServiceImpl implements QueryOrderService {
 
         return orderList.stream()
                 .map(OrderResponseDto::fromEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Order getOrderByProductId(String productId) {
         return queryOrderRepository.findOrderByProductId(productId)
                 .orElseThrow(() -> new ClientException(
@@ -44,9 +44,17 @@ public class QueryOrderServiceImpl implements QueryOrderService {
                 ));
     }
 
+
     @Override
-    @Transactional(readOnly = true)
     public boolean orderExistsByProductId(String productId) {
         return queryOrderRepository.existsOrderByProductId(productId);
+    }
+
+    @Override
+    public List<OrderResponseDto> getOrderInfo(String userId) {
+        List<Order> orderList = queryOrderRepository.findOrderByUserId(userId);
+        return orderList.stream()
+                .map(OrderResponseDto::fromEntity)
+                .toList();
     }
 }

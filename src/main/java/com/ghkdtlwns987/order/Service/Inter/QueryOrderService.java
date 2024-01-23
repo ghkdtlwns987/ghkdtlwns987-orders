@@ -12,5 +12,6 @@ public interface QueryOrderService {
     Order getOrderByProductId(String orderId) throws Exception;
 
     boolean orderExistsByProductId(String productId);
+    List<OrderResponseDto> getOrderInfo(String userId) throws Exception;
 
 }

@@ -19,7 +19,7 @@ public class CommandOrderServiceImpl implements CommandOrderService {
     private final QueryOrderService queryOrderService;
     @Override
     @Transactional
-    public OrderResponseDto createOrder(String userId, OrderRequestDto orderRequestDto) throws Exception{
+    public OrderResponseDto createOrder(String userId, OrderRequestDto orderRequestDto) {
         if(productIdAlreadyExists(orderRequestDto)){
             throw new ProductIdAlreadyExistsException();
         }
@@ -27,12 +27,6 @@ public class CommandOrderServiceImpl implements CommandOrderService {
         Order response = commandOrderRepository.save(order);
 
         return OrderResponseDto.fromEntity(response);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<OrderResponseDto> getOrderInfo(String userId) throws Exception {
-        return queryOrderService.getOrderByUserId(userId);
     }
 
 

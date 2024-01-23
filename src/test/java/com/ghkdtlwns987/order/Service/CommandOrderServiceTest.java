@@ -12,6 +12,8 @@ import com.ghkdtlwns987.order.Service.Impl.CommandOrderServiceImpl;
 import com.ghkdtlwns987.order.Service.Impl.QueryOrderServiceImpl;
 import com.ghkdtlwns987.order.Service.Inter.QueryOrderService;
 import jakarta.persistence.EntityListeners;
+import org.assertj.core.groups.Tuple;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +40,7 @@ import static org.mockito.Mockito.never;
 @ExtendWith(MockitoExtension.class)
 public class CommandOrderServiceTest {
     private CommandOrderRepository commandOrderRepository;
+    private QueryOrderRepository queryOrderRepository;
     private QueryOrderService queryOrderService;
     private CommandOrderServiceImpl commandOrderService;
 
@@ -49,12 +52,14 @@ public class CommandOrderServiceTest {
     private final Integer qty = 5;
     private final Integer unitPrice = 1000;
     private final String userId = "c11b7d71-5b23-4a3d-a867-3e97cc8624e3";
+    private final String orderId = UUID.randomUUID().toString();
 
-
-    private
+    Order order1;
+    Order order2;
     @BeforeEach
     void setUp(){
         commandOrderRepository = Mockito.mock(CommandOrderRepository.class);
+        queryOrderRepository = Mockito.mock(QueryOrderRepository.class);
         queryOrderService = Mockito.mock(QueryOrderService.class);
         commandOrderService = new CommandOrderServiceImpl(commandOrderRepository, queryOrderService);
 
@@ -63,79 +68,26 @@ public class CommandOrderServiceTest {
                 qty,
                 unitPrice
         );
+
+        order1 = Order.builder()
+                .productId(productId1)
+                .qty(qty)
+                .unitPrice(unitPrice)
+                .totalPrice(1000)
+                .userId(userId)
+                .orderId(orderId)
+                .build();
+
+        order2 = Order.builder()
+                .productId(productId2)
+                .qty(qty)
+                .unitPrice(unitPrice)
+                .totalPrice(1000)
+                .userId(userId)
+                .orderId(orderId)
+                .build();
     }
 
-    @Test
-    void userId가_존재하지_않으면_빈_배열_반환() throws Exception{
-        // given
-        OrderResponseDto orderResponseDto = new OrderResponseDto();
-        List<OrderResponseDto> orderResponse = Arrays.asList(
-                orderResponseDto
-        );
-        when(queryOrderService.getOrderByUserId(userId)).thenReturn(orderResponse);
-
-        // when
-        List<OrderResponseDto> result = commandOrderService.getOrderInfo(userId);
-        assertEquals(orderResponse.size(), result.size());
-
-        // then
-        verify(queryOrderService, times(1)).getOrderByUserId(userId);
-    }
-    @Test
-    void 주문_조회_성공() throws Exception {
-        final String orderId = UUID.randomUUID().toString();
-        LocalDateTime orderedAt = LocalDateTime.now();
-        OrderResponseDto orderResponseDto1 = new OrderResponseDto(
-                productId1,
-                qty,
-                unitPrice,
-                1000,
-                userId,
-                orderId,
-                orderedAt
-        );
-        OrderResponseDto orderResponseDto2 = new OrderResponseDto(
-                productId2,
-                qty,
-                unitPrice,
-                1000,
-                userId,
-                orderId,
-                orderedAt
-        );
-
-        // given
-        List<OrderResponseDto> orderResponse = Arrays.asList(
-                orderResponseDto1,
-                orderResponseDto2
-        );
-
-        when(queryOrderService.getOrderByUserId(userId)).thenReturn(orderResponse);
-
-        // when
-        List<OrderResponseDto> result = commandOrderService.getOrderInfo(userId);
-
-        // then
-        assertEquals(orderResponse.size(), result.size());
-
-        assertThat(orderResponse.get(0).getProductId()).isEqualTo(result.get(0).getProductId());
-        assertThat(orderResponse.get(0).getQty()).isEqualTo(result.get(0).getQty());
-        assertThat(orderResponse.get(0).getUnitPrice()).isEqualTo(result.get(0).getUnitPrice());
-        assertThat(orderResponse.get(0).getTotalPrice()).isEqualTo(result.get(0).getTotalPrice());
-        assertThat(orderResponse.get(0).getUserId()).isEqualTo(result.get(0).getUserId());
-        assertThat(orderResponse.get(0).getOrderId()).isEqualTo(result.get(0).getOrderId());
-        assertThat(orderResponse.get(0).getOrderedAt()).isEqualTo(result.get(0).getOrderedAt());
-
-        assertThat(orderResponse.get(1).getProductId()).isEqualTo(result.get(1).getProductId());
-        assertThat(orderResponse.get(1).getQty()).isEqualTo(result.get(1).getQty());
-        assertThat(orderResponse.get(1).getUnitPrice()).isEqualTo(result.get(1).getUnitPrice());
-        assertThat(orderResponse.get(1).getTotalPrice()).isEqualTo(result.get(1).getTotalPrice());
-        assertThat(orderResponse.get(1).getUserId()).isEqualTo(result.get(1).getUserId());
-        assertThat(orderResponse.get(1).getOrderId()).isEqualTo(result.get(1).getOrderId());
-        assertThat(orderResponse.get(1).getOrderedAt()).isEqualTo(result.get(1).getOrderedAt());
-
-        verify(queryOrderService, times(1)).getOrderByUserId(userId);
-    }
 
     @Test
     void 이미_등록된_주문번호(){
@@ -167,13 +119,16 @@ public class CommandOrderServiceTest {
         // when
         OrderResponseDto response = commandOrderService.createOrder(userId, orderRequestDto);
 
+
         // then
-        assertThat(response.getProductId()).isEqualTo(savedOrder.getProductId());
-        assertThat(response.getQty()).isEqualTo(savedOrder.getQty());
-        assertThat(response.getUnitPrice()).isEqualTo(savedOrder.getUnitPrice());
-        assertThat(response.getTotalPrice()).isEqualTo(savedOrder.getTotalPrice());
-        assertThat(response.getUserId()).isEqualTo(savedOrder.getUserId());
-        assertThat(response.getOrderId()).isEqualTo(savedOrder.getOrderId());
+        Assertions.assertAll(
+                () -> assertThat(response.getProductId()).isEqualTo(savedOrder.getProductId()),
+                () -> assertThat(response.getQty()).isEqualTo(savedOrder.getQty()),
+                () -> assertThat(response.getUnitPrice()).isEqualTo(savedOrder.getUnitPrice()),
+                () -> assertThat(response.getTotalPrice()).isEqualTo(savedOrder.getTotalPrice()),
+                () -> assertThat(response.getUserId()).isEqualTo(savedOrder.getUserId()),
+                () -> assertThat(response.getOrderId()).isEqualTo(savedOrder.getOrderId())
+        );
 
         verify(commandOrderRepository, times(1)).save(any());
     }
