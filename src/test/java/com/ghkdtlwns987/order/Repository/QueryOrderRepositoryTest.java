@@ -68,7 +68,6 @@ public class QueryOrderRepositoryTest extends IntegrationTest {
                 unitPrice
         );
         order1 = Order.builder()
-                .Id(1L)
                 .productId(productId1)
                 .qty(qty)
                 .unitPrice(unitPrice)
@@ -77,22 +76,20 @@ public class QueryOrderRepositoryTest extends IntegrationTest {
                 .orderId(orderId1)
                 .build();
         order2 = Order.builder()
-                .Id(2L)
                 .productId(productId2)
                 .qty(qty)
                 .unitPrice(unitPrice)
                 .totalPrice(1000)
                 .userId(userId)
-                .orderId(orderId1)
+                .orderId(orderId2)
                 .build();
-        order2 = Order.builder()
-                .Id(3L)
-                .productId(productId2)
+        order3 = Order.builder()
+                .productId(productId3)
                 .qty(qty)
                 .unitPrice(unitPrice)
                 .totalPrice(1000)
                 .userId(userId)
-                .orderId(orderId1)
+                .orderId(orderId3)
                 .build();
 
         entityManager.persist(order1);
@@ -121,7 +118,7 @@ public class QueryOrderRepositoryTest extends IntegrationTest {
         assertThat(orderList).hasSize(0);
     }
     @Test
-    void 주문_검색_테스트() throws Exception{
+    void 주문_검색_테스트(){
         // when
         List<Order> foundOrder = queryOrderRepository.findOrderByUserId(userId);
 

@@ -1,25 +1,21 @@
 package com.ghkdtlwns987.order.Service.Impl;
 
-import com.ghkdtlwns987.order.Dto.OrderRequestDto;
 import com.ghkdtlwns987.order.Dto.OrderResponseDto;
 import com.ghkdtlwns987.order.Entity.Order;
-import com.ghkdtlwns987.order.Exception.Class.ProductIdAlreadyExistsException;
 import com.ghkdtlwns987.order.Exception.ClientException;
 import com.ghkdtlwns987.order.Exception.ErrorCode;
-import com.ghkdtlwns987.order.Repository.CommandOrderRepository;
 import com.ghkdtlwns987.order.Repository.QueryOrderRepository;
 import com.ghkdtlwns987.order.Service.Inter.QueryOrderService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class QueryOrderServiceImpl implements QueryOrderService {
