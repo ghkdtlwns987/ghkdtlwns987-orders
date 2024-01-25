@@ -130,6 +130,7 @@ public class CommandOrderControllerTest {
     @Test
     void 주문_생성요청_테스트() throws Exception {
         // given
+        queryOrderService.orderExistsByProductId(productId1);
         commandOrderRepository.save(order1);
         OrderResponseDto orderResponseDto = OrderResponseDto.fromEntity(order1);
 
@@ -155,6 +156,7 @@ public class CommandOrderControllerTest {
                 .andExpect(jsonPath("$.data.orderId", equalTo(orderResponseDto.getOrderId())))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
+        verify(queryOrderService, times(1)).orderExistsByProductId(any());
         verify(commandOrderService, times(1)).createOrder(any(), any(OrderRequestDto.class));
         verify(commandOrderRepository, times(1)).save(any(Order.class));
 
