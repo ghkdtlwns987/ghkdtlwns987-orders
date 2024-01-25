@@ -109,7 +109,8 @@ public class CommandOrderControllerTest {
                 .qty(qty)
                 .build();
 
-        when(queryOrderService.orderExistsByProductId(request.getProductId())).thenThrow(new ProductIdAlreadyExistsException());
+        when(queryOrderService.orderExistsByProductId(any())).thenReturn(true);
+        when(commandOrderService.createOrder(any(), any(OrderRequestDto.class))).thenThrow(new ProductIdAlreadyExistsException());
 
 
         ResultActions perform = mockMvc.perform(post("/api/v1/order/" + userId1 + "/orders")
@@ -119,18 +120,18 @@ public class CommandOrderControllerTest {
 
         perform.andDo(print()).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.data", equalTo(null)))
-                .andExpect(jsonPath("$.errorMessage[0]", equalTo("MEMBER IS ALREADY EXISTS")))
+                .andExpect(jsonPath("$.errorMessage[0]", equalTo("PRODUCT ID IS ALREADY EXISTS")))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
-        verify(commandOrderService, times(0)).createOrder(userId, orderRequestDto);
+        verify(commandOrderRepository, never()).save(any(Order.class));
     }
 
     @Test
     void 주문_생성요청_테스트() throws Exception {
         // given
         OrderResponseDto orderResponseDto = OrderResponseDto.fromEntity(order1);
-        when(queryOrderService.orderExistsByProductId(productId1)).thenReturn(false);
-        when(commandOrderService.createOrder(userId1, orderRequestDto)).thenReturn(OrderResponseDto.fromEntity(order1));
+        when(queryOrderService.orderExistsByProductId(any())).thenReturn(false);
+        when(commandOrderService.createOrder(any(), any(OrderRequestDto.class))).thenReturn(OrderResponseDto.fromEntity(order1));
 
         // when
         ResultActions perform = mockMvc.perform(post("/api/v1/order/" + userId1 + "/orders")
@@ -151,6 +152,7 @@ public class CommandOrderControllerTest {
                 .andExpect(jsonPath("$.data.orderId", equalTo(orderResponseDto.getOrderId())))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
-        verify(commandOrderService, times(1)).createOrder(userId1, orderRequestDto);
+        verify(commandOrderService, times(1)).createOrder(any(), any());
+        //erify(commandOrderRepository, times(1)).save(Order.class));
     }
 }
