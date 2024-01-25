@@ -123,16 +123,19 @@ public class CommandOrderControllerTest {
                 .andExpect(jsonPath("$.errorMessage[0]", equalTo("PRODUCT ID IS ALREADY EXISTS")))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
+        verify(commandOrderService, times(1)).createOrder(any(), any(OrderRequestDto.class));
         verify(commandOrderRepository, never()).save(any(Order.class));
     }
 
     @Test
     void 주문_생성요청_테스트() throws Exception {
         // given
+        commandOrderRepository.save(order1);
         OrderResponseDto orderResponseDto = OrderResponseDto.fromEntity(order1);
+
         when(queryOrderService.orderExistsByProductId(any())).thenReturn(false);
         when(commandOrderService.createOrder(any(), any(OrderRequestDto.class))).thenReturn(OrderResponseDto.fromEntity(order1));
-
+        when(commandOrderRepository.save(any(Order.class))).thenReturn(order1);
         // when
         ResultActions perform = mockMvc.perform(post("/api/v1/order/" + userId1 + "/orders")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -153,5 +156,7 @@ public class CommandOrderControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
         verify(commandOrderService, times(1)).createOrder(any(), any(OrderRequestDto.class));
+        verify(commandOrderRepository, times(1)).save(any(Order.class));
+
     }
 }
