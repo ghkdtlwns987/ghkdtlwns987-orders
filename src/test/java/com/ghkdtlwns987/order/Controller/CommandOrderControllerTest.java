@@ -152,7 +152,6 @@ public class CommandOrderControllerTest {
                 .andExpect(jsonPath("$.data.orderId", equalTo(orderResponseDto.getOrderId())))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
-        verify(commandOrderService, times(1)).createOrder(any(), any());
-        //erify(commandOrderRepository, times(1)).save(Order.class));
+        verify(commandOrderService, times(1)).createOrder(any(), any(OrderRequestDto.class));
     }
 }
