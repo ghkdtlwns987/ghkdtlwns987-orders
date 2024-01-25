@@ -22,7 +22,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @RequiredArgsConstructor
 public class CommandOrderController
 {
-    private final QueryOrderService orderService;
+    private final QueryOrderService queryOrderService;
     private final CommandOrderService commandOrderService;
 
     @PostMapping("/{userId}/orders")
@@ -35,7 +35,7 @@ public class CommandOrderController
 
     @GetMapping("/{userId}/orders")
     public ResponseEntity<ResultListResponse> getOrders(@PathVariable String userId) throws Exception {
-        List<OrderResponseDto> result = orderService.getOrderByUserId(userId);
+        List<OrderResponseDto> result = queryOrderService.getOrderByUserId(userId);
         ResultListResponse resultResponse = ResultListResponse.of(ResultCode.GET_ORDER_REQUEST_SUCCESS, result);
         return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
     }
