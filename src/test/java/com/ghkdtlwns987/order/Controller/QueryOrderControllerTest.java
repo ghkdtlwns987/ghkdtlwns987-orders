@@ -4,15 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ghkdtlwns987.order.Dto.OrderRequestDto;
 import com.ghkdtlwns987.order.Dto.OrderResponseDto;
 import com.ghkdtlwns987.order.Entity.Order;
-import com.ghkdtlwns987.order.Repository.CommandOrderRepository;
-import com.ghkdtlwns987.order.Repository.QueryOrderRepository;
-import com.ghkdtlwns987.order.Service.Inter.CommandOrderService;
 import com.ghkdtlwns987.order.Service.Inter.QueryOrderService;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -31,27 +25,17 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(QueryOrderController.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class QueryOrderControllerTest {
-
-    @MockBean
-    private CommandOrderService commandOrderService;
-
-    @Mock
-    private QueryOrderRepository queryOrderRepository;
     @MockBean
     private QueryOrderService queryOrderService;
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private final String userId1 = "c291c70c-0a00-4165-a665-a3fb657f08b1";
     private final String productId1 = "CATALOG-0001";
@@ -74,7 +58,6 @@ public class QueryOrderControllerTest {
     private String userId = UUID.randomUUID().toString();
     @BeforeEach
     void setUp() {
-        queryOrderRepository = Mockito.mock(QueryOrderRepository.class);
         orderRequestDto = OrderRequestDto.builder()
                 .productId(productId1)
                 .qty(qty)
@@ -127,7 +110,6 @@ public class QueryOrderControllerTest {
         // when
         ResultActions perform = mockMvc.perform(get("/api/v1/order/" + invalidUserId + "/orders")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(orderRequestDto))
         );
 
         // then
@@ -152,7 +134,6 @@ public class QueryOrderControllerTest {
         // when
         ResultActions perform = mockMvc.perform(get("/api/v1/order/" + userId1 + "/orders")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(orderRequestDto))
         );
 
         // then
