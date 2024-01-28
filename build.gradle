@@ -39,7 +39,11 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    // runtimeOnly 'org.mariadb.jdbc:mariadb-java'
+    //implementation 'mysql:mysql-connector-java:8.0.32'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client' // MariaDB
+
+
 
 
 }

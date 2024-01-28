@@ -1,0 +1,50 @@
+SERVER_PORT : 8002
+AUTHENTICATION: http://localhost:9001/authentication
+AUTHORIZATION: http://localhost:9001/authorization
+MEMBER_URL: http://localhost:8000/api/v1/member
+
+server:
+  port: ${SERVER_PORT}
+
+
+spring:
+  profiles:
+    active:
+      on-profile:
+        - dev
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+      path: /h2-console
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+    username: h2test
+    password: h2test
+
+  # JPA
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    open-in-view: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+    format_sql: true
+    show-sql: true
+    defer-datasource-initialization: true
+
+auth:
+  authentication:
+    url: ${AUTHENTICATION}
+  authorization:
+    url: ${AUTHORIZATION}
+
+order:
+  url: ${ORDER}
+catalog:
+  url: ${CATALOG}
