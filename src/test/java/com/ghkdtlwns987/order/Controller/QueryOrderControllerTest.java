@@ -83,7 +83,7 @@ public class QueryOrderControllerTest {
                 .build();
 
         order3 = Order.builder()
-                .productId(productId2)
+                .productId(productId3)
                 .qty(qty)
                 .unitPrice(unitPrice)
                 .totalPrice(3000)
@@ -102,9 +102,7 @@ public class QueryOrderControllerTest {
         final String invalidUserId = "invalid-userId-string";
         List<OrderResponseDto> responses = new ArrayList<>();
 
-        queryOrderService.orderExistsByProductId(productId1);
         queryOrderService.getOrderByUserId(userId);
-        when(queryOrderService.orderExistsByProductId(any())).thenReturn(false);
         when(queryOrderService.getOrderByUserId(any())).thenReturn(responses);
 
         // when
@@ -123,10 +121,9 @@ public class QueryOrderControllerTest {
     }
 
     @Test
-    void 주문_생성요청_테스트() throws Exception {
+    void 주문_생성내역_조회_테스트() throws Exception {
         // given
         queryOrderService.orderExistsByProductId(productId1);
-        queryOrderService.getOrderByUserId(userId);
         queryOrderService.getOrderByUserId(userId);
         when(queryOrderService.orderExistsByProductId(any())).thenReturn(false);
         when(queryOrderService.getOrderByUserId(any())).thenReturn(responses);

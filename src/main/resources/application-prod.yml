@@ -1,0 +1,51 @@
+SERVER_PORT : 8002
+AUTHENTICATION: http://localhost:9001/authentication
+AUTHORIZATION: http://localhost:9001/authorization
+MEMBER_URL: http://localhost:8000/api/v1/member
+
+server:
+  port: ${SERVER_PORT}
+
+spring:
+  profiles:
+    active:
+      on-profile:
+        - prod
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+      path: /h2-console
+
+  # JPA
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    open-in-view: true
+    properties:
+      hibernate:
+        database-platform: org.hibernate.dialect.MariaDB103Dialect
+    format_sql: true
+    show-sql: true
+    defer-datasource-initialization: true
+
+
+  datasource:
+    url: jdbc:mariadb://localhost:3306/test
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: ghkdtlwns987
+    password: root
+
+auth:
+  authentication:
+    url: ${AUTHENTICATION}
+  authorization:
+    url: ${AUTHORIZATION}
+
+order:
+  url: ${ORDER}
+catalog:
+  url: ${CATALOG}
+
