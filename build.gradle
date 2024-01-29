@@ -43,9 +43,8 @@ dependencies {
     //implementation 'mysql:mysql-connector-java:8.0.32'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client' // MariaDB
 
-
-
-
+    // aop
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
 }
 
 tasks.named('test') {

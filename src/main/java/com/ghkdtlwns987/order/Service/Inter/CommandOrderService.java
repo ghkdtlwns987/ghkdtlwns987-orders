@@ -6,5 +6,5 @@ import com.ghkdtlwns987.order.Dto.OrderResponseDto;
 import java.util.List;
 
 public interface CommandOrderService {
-    OrderResponseDto createOrder(String userID, OrderRequestDto orderRequestDto);
+    OrderResponseDto createOrder(String userId, OrderRequestDto orderRequestDto);
 }
