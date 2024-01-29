@@ -105,7 +105,6 @@ public class CommandOrderServiceTest {
                 .orderId(UUID.randomUUID().toString())
                 .build();
 
-        doReturn(false).when(queryOrderService).orderExistsByProductId(productId1);
         when(commandOrderRepository.save(any(Order.class))).thenReturn(savedOrder);
         // when
         OrderResponseDto response = commandOrderService.createOrder(userId, orderRequestDto);

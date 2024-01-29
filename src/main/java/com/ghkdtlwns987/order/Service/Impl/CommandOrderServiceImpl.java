@@ -21,20 +21,9 @@ public class CommandOrderServiceImpl implements CommandOrderService {
     @Override
     @Transactional
     public OrderResponseDto createOrder(String userId, OrderRequestDto orderRequestDto) {
-        if(productIdAlreadyExists(orderRequestDto)){
-            throw new ProductIdAlreadyExistsException();
-        }
         Order order = orderRequestDto.toEntity(userId);
         Order response = commandOrderRepository.save(order);
 
         return OrderResponseDto.fromEntity(response);
-    }
-
-
-    private boolean productIdAlreadyExists(OrderRequestDto orderRequestDto){
-        if(queryOrderService.orderExistsByProductId(orderRequestDto.getProductId())){
-            return true;
-        }
-        return false;
     }
 }
