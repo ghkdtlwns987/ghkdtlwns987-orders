@@ -41,7 +41,7 @@ dependencies {
 
     // runtimeOnly 'org.mariadb.jdbc:mariadb-java'
     //implementation 'mysql:mysql-connector-java:8.0.32'
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client' // MariaDB
+    implementation 'org.mariadb.jdbc:mariadb-java-client' // MariaDB
 
     // aop
     implementation 'org.springframework.boot:spring-boot-starter-aop'
