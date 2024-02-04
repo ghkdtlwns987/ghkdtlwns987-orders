@@ -5,7 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ghkdtlwns987.order.Catalog.Config.CatalogConfig;
-import com.ghkdtlwns987.order.Catalog.Dto.ResponseCatalogDto;
+import com.ghkdtlwns987.order.Catalog.Dto.ResponseOrderForCatalogDto;
+import com.ghkdtlwns987.order.Exception.Class.ProductIdNotExistsException;
 import com.ghkdtlwns987.order.Exception.ClientException;
 import com.ghkdtlwns987.order.Exception.ErrorCode;
 import com.ghkdtlwns987.order.Global.ResultListResponse;
@@ -30,8 +31,8 @@ public class QueryCatalog {
     private final CatalogConfig catalogConfig;
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
-
-    public ResponseCatalogDto getCategoriesByProductIdRequest(String productId) throws ServerException {
+    
+    public ResponseOrderForCatalogDto getCategoriesByProductIdRequest(String productId) throws ServerException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -59,13 +60,13 @@ public class QueryCatalog {
             Object data = resultResponse.getData();
 
             return Optional.ofNullable(data)
-                    .map(d -> objectMapper.convertValue(d, ResponseCatalogDto.class))
-                    .orElseThrow(() -> new RuntimeException("Failed to map JSON response to ResponseCatalogDto"));
+                    .map(d -> objectMapper.convertValue(d, ResponseOrderForCatalogDto.class))
+                    .orElseThrow(() -> new RuntimeException("Failed to map JSON response to ResponseOrderForCatalogDto"));
         } catch (HttpClientErrorException e){
             log.error("", e);
 
             if (e.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-                throw new ClientException(ErrorCode.PRODUCT_ID_NOT_EXISTS, "ProductId Not Exists Exists");
+                throw new ClientException(ErrorCode.PRODUCT_ID_NOT_EXISTS, "ProductId Not Exists");
             }
             throw new ServerException(
                     ErrorCode.INTERNAL_SERVER_ERROR.getCode()
@@ -77,7 +78,7 @@ public class QueryCatalog {
         }
     }
 
-    public List<ResponseCatalogDto> getCategoriesByProductNameRequest(String productName){
+    public List<ResponseOrderForCatalogDto> getCategoriesByProductNameRequest(String productName){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -86,18 +87,19 @@ public class QueryCatalog {
                 .path("/catalog/catalogs/search/" + productName)
                 .build()
                 .toUri();
-        ResponseEntity<String> response = restTemplate.exchange(
-                uri,
-                HttpMethod.GET,
-                new HttpEntity<>(headers),
-                String.class
-        );
 
-        String jsonResponse = response.getBody();
         try {
-            ResultListResponse<ResponseCatalogDto> resultListResponse = objectMapper.readValue(
+            ResponseEntity<String> response = restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    String.class
+            );
+
+            String jsonResponse = response.getBody();
+            ResultListResponse<ResponseOrderForCatalogDto> resultListResponse = objectMapper.readValue(
                     jsonResponse,
-                    new TypeReference<ResultListResponse<ResponseCatalogDto>>() {}
+                    new TypeReference<ResultListResponse<ResponseOrderForCatalogDto>>() {}
             );
             log.info("Received Response: " + resultListResponse);
             return resultListResponse.getData();

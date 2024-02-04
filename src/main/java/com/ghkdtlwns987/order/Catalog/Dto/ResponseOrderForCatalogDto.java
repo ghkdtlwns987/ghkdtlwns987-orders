@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseCatalogDto {
+public class ResponseOrderForCatalogDto {
     private String productId;
     private String productName;
     private Integer stock;
