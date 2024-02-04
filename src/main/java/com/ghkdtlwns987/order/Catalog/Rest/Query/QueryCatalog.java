@@ -66,7 +66,7 @@ public class QueryCatalog {
             log.error("", e);
 
             if (e.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-                throw new ClientException(ErrorCode.PRODUCT_ID_NOT_EXISTS, "ProductId Not Exists");
+                throw new ClientException(ErrorCode.PRODUCT_ID_NOT_EXISTS, ErrorCode.PRODUCT_ID_NOT_EXISTS.getMessage());
             }
             throw new ServerException(
                     ErrorCode.INTERNAL_SERVER_ERROR.getCode()
