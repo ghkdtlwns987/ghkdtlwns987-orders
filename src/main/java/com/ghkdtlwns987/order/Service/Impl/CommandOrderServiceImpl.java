@@ -24,7 +24,7 @@ public class CommandOrderServiceImpl implements CommandOrderService {
     @Override
     @Transactional
     public OrderResponseDto createOrder(String userId, OrderRequestDto orderRequestDto) throws ServerException {
-        commandCatalog.createCatalogRequest(orderRequestDto.toCatalog());
+        commandCatalog.createOrderRequestForCatalog(orderRequestDto.toCatalog());
         Order order = orderRequestDto.toEntity(userId);
         Order response = commandOrderRepository.save(order);
         return OrderResponseDto.fromEntity(response);

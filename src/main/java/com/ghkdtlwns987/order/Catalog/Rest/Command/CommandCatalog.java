@@ -28,7 +28,7 @@ public class CommandCatalog {
     private final CatalogConfig catalogConfig;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
-    public ResponseOrderForCatalogDto createCatalogRequest(RequestOrderForCatalogDto request) throws ServerException {
+    public ResponseOrderForCatalogDto createOrderRequestForCatalog(RequestOrderForCatalogDto request) throws ServerException {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -47,7 +47,7 @@ public class CommandCatalog {
         try {
             ResponseEntity<String> responseEntity = restTemplate.exchange(
                     uri,
-                    HttpMethod.POST,
+                    HttpMethod.PUT,
                     requestEntity,
                     String.class
             );
@@ -64,7 +64,7 @@ public class CommandCatalog {
             log.error("", e);
 
             if (e.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-                throw new ClientException(ErrorCode.PRODUCT_ID_NOT_EXISTS, "ProductId Not Exists");
+                throw new ClientException(ErrorCode.PRODUCT_ID_ALREADY_EXISTS, "ProductId Already Exists");
             }
             throw new ServerException(
                     ErrorCode.INTERNAL_SERVER_ERROR.getCode()
