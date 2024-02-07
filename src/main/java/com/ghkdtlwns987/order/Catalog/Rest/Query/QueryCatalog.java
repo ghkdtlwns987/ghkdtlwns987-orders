@@ -29,8 +29,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class QueryCatalog {
     private final CatalogConfig catalogConfig;
-    private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
     
     public ResponseOrderForCatalogDto getCategoriesByProductIdRequest(String productId) throws ServerException {
         HttpHeaders headers = new HttpHeaders();

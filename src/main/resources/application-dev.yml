@@ -3,7 +3,6 @@ AUTHENTICATION: http://localhost:8000/authentication
 AUTHORIZATION: http://localhost:8000/authorization
 ORDER: http://localhost:8002/api/v1
 CATALOG: http://localhost:8001/api/v1
-
 server:
   port: ${SERVER_PORT}
 

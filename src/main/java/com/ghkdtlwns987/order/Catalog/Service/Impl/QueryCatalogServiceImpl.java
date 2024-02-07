@@ -17,7 +17,6 @@ public class QueryCatalogServiceImpl implements QueryCatalogService {
     private final QueryCatalog queryCatalog;
     @Override
     public ResponseOrderForCatalogDto queryCatalogByProductId(RequestOrderForCatalogDto requestCatalogDto) throws ServerException {
-        ResponseOrderForCatalogDto response = queryCatalog.getCategoriesByProductIdRequest(requestCatalogDto.getProductId());
-        return response;
+        return queryCatalog.getCategoriesByProductIdRequest(requestCatalogDto.getProductId());
     }
 }
