@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ghkdtlwns987.order.Dto.OrderRequestDto;
 import com.ghkdtlwns987.order.Dto.OrderResponseDto;
 import com.ghkdtlwns987.order.Entity.Order;
-import com.ghkdtlwns987.order.Exception.Class.ProductIdAlreadyExistsException;
 import com.ghkdtlwns987.order.Repository.CommandOrderRepository;
 import com.ghkdtlwns987.order.Repository.QueryOrderRepository;
 import com.ghkdtlwns987.order.Service.Inter.CommandOrderService;

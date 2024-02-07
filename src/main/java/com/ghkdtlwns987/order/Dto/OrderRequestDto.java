@@ -1,12 +1,12 @@
 package com.ghkdtlwns987.order.Dto;
 
+import com.ghkdtlwns987.order.Catalog.Dto.RequestOrderForCatalogDto;
 import com.ghkdtlwns987.order.Entity.Order;
 import lombok.*;
 
 import java.util.UUID;
 
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,6 +30,13 @@ public class OrderRequestDto {
                 .totalPrice(qty * unitPrice)
                 .userId(userId)
                 .orderId(UUID.randomUUID().toString())
+                .build();
+    }
+
+    public RequestOrderForCatalogDto toCatalog(){
+        return RequestOrderForCatalogDto
+                .builder()
+                .productId(productId)
                 .build();
     }
 }

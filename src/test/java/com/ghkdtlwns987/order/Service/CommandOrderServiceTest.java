@@ -1,9 +1,10 @@
 package com.ghkdtlwns987.order.Service;
 
+import com.ghkdtlwns987.order.Catalog.Rest.Command.CommandCatalog;
 import com.ghkdtlwns987.order.Dto.OrderRequestDto;
 import com.ghkdtlwns987.order.Dto.OrderResponseDto;
 import com.ghkdtlwns987.order.Entity.Order;
-import com.ghkdtlwns987.order.Exception.Class.ProductIdAlreadyExistsException;
+import com.ghkdtlwns987.order.Exception.Class.ProductIdNotExistsException;
 import com.ghkdtlwns987.order.Exception.ErrorCode;
 import com.ghkdtlwns987.order.Repository.CommandOrderRepository;
 import com.ghkdtlwns987.order.Repository.QueryOrderRepository;
@@ -19,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
+import java.rmi.ServerException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,6 +36,7 @@ public class CommandOrderServiceTest {
     private QueryOrderRepository queryOrderRepository;
     private QueryOrderService queryOrderService;
     private CommandOrderServiceImpl commandOrderService;
+    private CommandCatalog commandCatalog;
 
     OrderRequestDto orderRequestDto;
     private final String productId1 = "CATALOG-0001";
@@ -52,7 +55,7 @@ public class CommandOrderServiceTest {
         commandOrderRepository = Mockito.mock(CommandOrderRepository.class);
         queryOrderRepository = Mockito.mock(QueryOrderRepository.class);
         queryOrderService = Mockito.mock(QueryOrderService.class);
-        commandOrderService = new CommandOrderServiceImpl(commandOrderRepository, queryOrderService);
+        commandOrderService = new CommandOrderServiceImpl(commandOrderRepository, commandCatalog);
 
         orderRequestDto = new OrderRequestDto(
                 productId1,
@@ -85,16 +88,16 @@ public class CommandOrderServiceTest {
         // given
         doReturn(true).when(queryOrderService).orderExistsByProductId(productId1);
 
-        ProductIdAlreadyExistsException error =
-                assertThrows(ProductIdAlreadyExistsException.class,
+        ProductIdNotExistsException error =
+                assertThrows(ProductIdNotExistsException.class,
                         () -> commandOrderService.createOrder(userId, orderRequestDto));
 
-        assertThat(error.getErrorCode()).isEqualTo(ErrorCode.PRODUCT_ID_ALREADY_EXISTS);
+        assertThat(error.getErrorCode()).isEqualTo(ErrorCode.PRODUCT_ID_NOT_EXISTS);
         verify(commandOrderRepository, never()).save(any());
     }
 
     @Test
-    void 주문_성공(){
+    void 주문_성공() throws ServerException {
         // given
         Order savedOrder = Order.builder()
                 .productId(productId1)
