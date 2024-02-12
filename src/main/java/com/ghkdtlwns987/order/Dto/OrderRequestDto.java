@@ -15,6 +15,9 @@ public class OrderRequestDto {
     /* 상품 Id */
     private String productId;
 
+    /* 상품 명 */
+    private String productName;
+
     /* 남은 수량 */
     private Integer qty;
 
@@ -37,6 +40,9 @@ public class OrderRequestDto {
         return RequestOrderForCatalogDto
                 .builder()
                 .productId(productId)
+                .productName(productName)
+                .qty(qty)
+                .unitPrice(unitPrice)
                 .build();
     }
 }

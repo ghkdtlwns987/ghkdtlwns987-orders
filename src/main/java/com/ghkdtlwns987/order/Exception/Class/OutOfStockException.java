@@ -5,7 +5,6 @@ import com.ghkdtlwns987.order.Exception.ErrorCode;
 
 public class OutOfStockException extends BuisinessException {
     public OutOfStockException(){
-        super(ErrorCode.PRODUCT_ID_NOT_EXISTS);
+        super(ErrorCode.OUT_OF_STOCK);
     }
-
 }

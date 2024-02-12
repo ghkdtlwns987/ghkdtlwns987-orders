@@ -37,7 +37,7 @@ public class CommandCatalog {
 
         URI uri = UriComponentsBuilder
                 .fromUriString(catalogConfig.getCatalogUrl())
-                .path("/catalog/catalogs")
+                .path("/catalog/orders")
                 .build()
                 .toUri();
 
@@ -64,7 +64,12 @@ public class CommandCatalog {
             log.error("", e);
 
             if (e.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-                throw new ClientException(ErrorCode.PRODUCT_ID_ALREADY_EXISTS, "ProductId Already Exists");
+                if(e.getMessage().equals(ErrorCode.PRODUCT_ID_NOT_EXISTS.getMessage())){
+                    throw new ClientException(ErrorCode.PRODUCT_ID_NOT_EXISTS, "ProductId Not Exists");
+                }
+                if(e.getMessage().equals(ErrorCode.OUT_OF_STOCK.getMessage())){
+                    throw new ClientException(ErrorCode.OUT_OF_STOCK, "OUT OF STOCK");
+                }
             }
             throw new ServerException(
                     ErrorCode.INTERNAL_SERVER_ERROR.getCode()

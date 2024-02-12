@@ -13,4 +13,13 @@ import lombok.*;
 public class RequestOrderForCatalogDto {
     /* 상품 Id */
     private String productId;
+
+    /* 상품 명 */
+    private String productName;
+
+    /* 주문 수량 */
+    private Integer qty;
+
+    /* 가격 */
+    private Integer unitPrice;
 }

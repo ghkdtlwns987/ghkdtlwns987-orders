@@ -1,5 +1,7 @@
 package com.ghkdtlwns987.order.Controller;
 
+import com.ghkdtlwns987.order.Exception.Class.OutOfStockException;
+import com.ghkdtlwns987.order.Exception.Class.ProductIdNotExistsException;
 import com.ghkdtlwns987.order.Exception.ClientException;
 import com.ghkdtlwns987.order.Exception.Dto.ErrorResponseDto;
 import lombok.extern.slf4j.Slf4j;
@@ -27,5 +29,15 @@ public class CommandOrderControllerAdvice {
         log.error("[INTERNAL_SERVER_ERROR] handleException", ex);
         ErrorResponseDto error = new ErrorResponseDto(ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
+    @ExceptionHandler({
+            ProductIdNotExistsException.class,
+            OutOfStockException.class
+    })
+    public ResponseEntity<ErrorResponseDto> handleProductException(Exception ex) {
+        log.error("[BAD_REQUEST] handleProductException", ex);
+        ErrorResponseDto error = new ErrorResponseDto(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 }
