@@ -64,11 +64,11 @@ public class CommandCatalog {
             log.error("", e);
 
             if (e.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-                if(e.getMessage().equals(ErrorCode.PRODUCT_ID_NOT_EXISTS.getMessage())){
-                    throw new ClientException(ErrorCode.PRODUCT_ID_NOT_EXISTS, "ProductId Not Exists");
+                if(e.getMessage().contains(ErrorCode.PRODUCT_ID_NOT_EXISTS.getMessage())){
+                    throw new ClientException(ErrorCode.PRODUCT_ID_NOT_EXISTS, ErrorCode.PRODUCT_ID_NOT_EXISTS.getMessage());
                 }
-                if(e.getMessage().equals(ErrorCode.OUT_OF_STOCK.getMessage())){
-                    throw new ClientException(ErrorCode.OUT_OF_STOCK, "OUT OF STOCK");
+                if(e.getMessage().contains(ErrorCode.OUT_OF_STOCK.getMessage())){
+                    throw new ClientException(ErrorCode.OUT_OF_STOCK, ErrorCode.OUT_OF_STOCK.getMessage());
                 }
             }
             throw new ServerException(
