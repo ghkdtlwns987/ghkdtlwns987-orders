@@ -4,12 +4,8 @@ import com.ghkdtlwns987.order.Catalog.Rest.Command.CommandCatalog;
 import com.ghkdtlwns987.order.Dto.OrderRequestDto;
 import com.ghkdtlwns987.order.Dto.OrderResponseDto;
 import com.ghkdtlwns987.order.Entity.Order;
-import com.ghkdtlwns987.order.Exception.Class.ProductIdNotExistsException;
-import com.ghkdtlwns987.order.Exception.ErrorCode;
 import com.ghkdtlwns987.order.Repository.CommandOrderRepository;
-import com.ghkdtlwns987.order.Repository.QueryOrderRepository;
 import com.ghkdtlwns987.order.Service.Impl.CommandOrderServiceImpl;
-import com.ghkdtlwns987.order.Service.Inter.QueryOrderService;
 import jakarta.persistence.EntityListeners;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,25 +20,22 @@ import java.rmi.ServerException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.never;
 
 @EntityListeners(AuditingEntityListener.class)
 @ExtendWith(MockitoExtension.class)
 public class CommandOrderServiceTest {
     private CommandOrderRepository commandOrderRepository;
-    private QueryOrderRepository queryOrderRepository;
-    private QueryOrderService queryOrderService;
     private CommandOrderServiceImpl commandOrderService;
     private CommandCatalog commandCatalog;
+
 
     OrderRequestDto orderRequestDto;
     private final String productId1 = "CATALOG-0001";
     private final String productId2 = "CATALOG-0002";
     private final String productId3 = "CATALOG-0003";
-
+    private final String productName = "Berlin";
     private final Integer qty = 5;
     private final Integer unitPrice = 1000;
     private final String userId = "c11b7d71-5b23-4a3d-a867-3e97cc8624e3";
@@ -53,12 +46,12 @@ public class CommandOrderServiceTest {
     @BeforeEach
     void setUp(){
         commandOrderRepository = Mockito.mock(CommandOrderRepository.class);
-        queryOrderRepository = Mockito.mock(QueryOrderRepository.class);
-        queryOrderService = Mockito.mock(QueryOrderService.class);
+        commandCatalog = Mockito.mock(CommandCatalog.class);
         commandOrderService = new CommandOrderServiceImpl(commandOrderRepository, commandCatalog);
 
         orderRequestDto = new OrderRequestDto(
                 productId1,
+                productName,
                 qty,
                 unitPrice
         );
@@ -80,20 +73,6 @@ public class CommandOrderServiceTest {
                 .userId(userId)
                 .orderId(orderId)
                 .build();
-    }
-
-
-    @Test
-    void 이미_등록된_주문번호(){
-        // given
-        doReturn(true).when(queryOrderService).orderExistsByProductId(productId1);
-
-        ProductIdNotExistsException error =
-                assertThrows(ProductIdNotExistsException.class,
-                        () -> commandOrderService.createOrder(userId, orderRequestDto));
-
-        assertThat(error.getErrorCode()).isEqualTo(ErrorCode.PRODUCT_ID_NOT_EXISTS);
-        verify(commandOrderRepository, never()).save(any());
     }
 
     @Test

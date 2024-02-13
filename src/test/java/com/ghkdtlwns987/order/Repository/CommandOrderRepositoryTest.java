@@ -21,6 +21,7 @@ public class CommandOrderRepositoryTest {
     private final String productId1 = "CATALOG-0001";
     private final String productId2 = "CATALOG-0002";
     private final String productId3 = "CATALOG-0003";
+    private final String productName = "Berlin";
 
     private final Integer qty = 5;
     private final Integer unitPrice = 1000;
@@ -37,17 +38,20 @@ public class CommandOrderRepositoryTest {
     void setUp(){
         orderRequestDto1 = new OrderRequestDto(
                 productId1,
+                productName,
                 qty,
                 unitPrice
         );
 
         orderRequestDto2 = new OrderRequestDto(
                 productId2,
+                productName,
                 qty,
                 unitPrice
         );
         orderRequestDto3 = new OrderRequestDto(
                 productId3,
+                productName,
                 qty,
                 unitPrice
         );

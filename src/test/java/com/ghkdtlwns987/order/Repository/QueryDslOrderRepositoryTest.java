@@ -1,13 +1,11 @@
 package com.ghkdtlwns987.order.Repository;
 
-import com.ghkdtlwns987.order.Dto.OrderResponseDto;
 import com.ghkdtlwns987.order.IntegrationTest;
 import com.ghkdtlwns987.order.Dto.OrderRequestDto;
 import com.ghkdtlwns987.order.Entity.Order;
 import com.ghkdtlwns987.order.Persistent.QueryDslQueryOrderRepository;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 @Transactional
-public class QueryOrderRepositoryTest extends IntegrationTest {
+public class QueryDslOrderRepositoryTest extends IntegrationTest{
     private final String productId1 = "CATALOG-0001";
     private final String productId2 = "CATALOG-0002";
     private final String productId3 = "CATALOG-0003";
+    private final String productName = "Berlin";
 
     private final Integer qty = 5;
     private final Integer unitPrice = 1000;
@@ -40,8 +39,6 @@ public class QueryOrderRepositoryTest extends IntegrationTest {
     OrderRequestDto orderRequestDto2;
     OrderRequestDto orderRequestDto3;
 
-    @Autowired
-    QueryOrderRepository queryOrderRepository;
 
     @Autowired
     QueryDslQueryOrderRepository queryDslQueryMemberRepository;
@@ -53,17 +50,20 @@ public class QueryOrderRepositoryTest extends IntegrationTest {
     void setUp(){
         orderRequestDto1 = new OrderRequestDto(
                 productId1,
+                productName,
                 qty,
                 unitPrice
         );
 
         orderRequestDto2 = new OrderRequestDto(
                 productId2,
+                productName,
                 qty,
                 unitPrice
         );
         orderRequestDto3 = new OrderRequestDto(
                 productId3,
+                productName,
                 qty,
                 unitPrice
         );
@@ -98,20 +98,20 @@ public class QueryOrderRepositoryTest extends IntegrationTest {
     }
 
     @Test
-    void 주문_검색_실패_productId가_존재하지_않음() throws Exception{
+    void 주문_검색_실패_productId가_존재하지_않음(){
         final String invalidProductId = "CATALOG-1111";
-        boolean result = queryOrderRepository.existsOrderByProductId(invalidProductId);
+        boolean result = queryDslQueryMemberRepository.existsOrderByProductId(invalidProductId);
         AssertionsForClassTypes.assertThat(result).isEqualTo(false);
     }
 
 
     @Test
-    void 주문_검색_실패_userId가_존재하지않아_조회_불가() throws Exception{
+    void 주문_검색_실패_userId가_존재하지않아_조회_불가(){
         // given
         final String invalidUserId = "invalid-userId-1111";
 
         // when
-        List<Order> foundOrder = queryOrderRepository.findOrderByUserId(invalidUserId);
+        List<Order> foundOrder = queryDslQueryMemberRepository.findOrderByUserId(invalidUserId);
 
         List<Order> orderList = new ArrayList<>();
         foundOrder.forEach(orderList::add);
@@ -120,7 +120,7 @@ public class QueryOrderRepositoryTest extends IntegrationTest {
     @Test
     void 주문_검색_테스트(){
         // when
-        List<Order> foundOrder = queryOrderRepository.findOrderByUserId(userId);
+        List<Order> foundOrder = queryDslQueryMemberRepository.findOrderByUserId(userId);
 
         List<Order> orderList = new ArrayList<>();
         foundOrder.forEach(orderList::add);

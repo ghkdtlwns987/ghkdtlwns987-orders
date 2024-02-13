@@ -1,9 +1,15 @@
 package com.ghkdtlwns987.order.Controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ghkdtlwns987.order.Catalog.Dto.RequestOrderForCatalogDto;
+import com.ghkdtlwns987.order.Catalog.Dto.ResponseOrderForCatalogDto;
+import com.ghkdtlwns987.order.Catalog.Service.Inter.QueryCatalogService;
 import com.ghkdtlwns987.order.Dto.OrderRequestDto;
 import com.ghkdtlwns987.order.Dto.OrderResponseDto;
 import com.ghkdtlwns987.order.Entity.Order;
+import com.ghkdtlwns987.order.Exception.ClientException;
+import com.ghkdtlwns987.order.Exception.ErrorCode;
 import com.ghkdtlwns987.order.Repository.CommandOrderRepository;
 import com.ghkdtlwns987.order.Repository.QueryOrderRepository;
 import com.ghkdtlwns987.order.Service.Inter.CommandOrderService;
@@ -21,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.rmi.ServerException;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -36,10 +43,11 @@ public class CommandOrderControllerTest {
     @MockBean
     private CommandOrderService commandOrderService;
 
-    @Mock
-    private QueryOrderRepository queryOrderRepository;
     @MockBean
     private QueryOrderService queryOrderService;
+
+    @MockBean
+    private QueryCatalogService queryCatalogService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -52,15 +60,15 @@ public class CommandOrderControllerTest {
 
     private final String userId1 = "c291c70c-0a00-4165-a665-a3fb657f08b1";
     private final String productId1 = "CATALOG-0001";
-    private final String productId2 = "CATALOG-0002";
-    private final String productId3 = "CATALOG-0003";
+    private final String productName = "Berlin";
     private final Integer qty = 3;
     private final Integer unitPrice = 1000;
 
     private OrderRequestDto orderRequestDto;
+    private OrderResponseDto orderResponseDto;
+    private ResponseOrderForCatalogDto responseOrderForCatalogDto;
+    private RequestOrderForCatalogDto requestOrderForCatalogDto;
     private Order order1;
-    private Order order2;
-    private Order order3;
     private String orderId = UUID.randomUUID().toString();
     private String userId = UUID.randomUUID().toString();
     @BeforeEach
@@ -81,61 +89,35 @@ public class CommandOrderControllerTest {
                 .userId(userId)
                 .build();
 
-        order2 = Order.builder()
-                .productId(productId2)
-                .qty(qty)
-                .unitPrice(unitPrice)
-                .totalPrice(3000)
-                .orderId(orderId)
-                .userId(userId)
-                .build();
-
-        order3 = Order.builder()
-                .productId(productId2)
-                .qty(qty)
-                .unitPrice(unitPrice)
-                .totalPrice(3000)
-                .orderId(orderId)
-                .userId(userId)
-                .build();
+        requestOrderForCatalogDto = orderRequestDto.toCatalog();
+        responseOrderForCatalogDto = new ResponseOrderForCatalogDto(productId1, productName, qty, unitPrice);
+        orderResponseDto = OrderResponseDto.fromEntity(order1);
     }
 
     @Test
     void 주문_생성요청_실패_productId가_이미_존재함() throws Exception{
-        OrderRequestDto request = OrderRequestDto.builder()
-                .productId(productId1)
-                .unitPrice(unitPrice)
-                .qty(qty)
-                .build();
-
-        when(queryOrderService.orderExistsByProductId(any())).thenReturn(true);
-        when(commandOrderService.createOrder(any(), any(OrderRequestDto.class))).thenThrow(new ProductIdAlreadyExistsException());
-
+        when(queryCatalogService.queryCatalogByProductId(any(RequestOrderForCatalogDto.class))).thenReturn(responseOrderForCatalogDto);
+        when(commandOrderService.createOrder(any(), any(OrderRequestDto.class))).thenThrow(new ClientException(ErrorCode.PRODUCT_ID_ALREADY_EXISTS, ErrorCode.PRODUCT_ID_ALREADY_EXISTS.getMessage()));
 
         ResultActions perform = mockMvc.perform(post("/api/v1/order/" + userId1 + "/orders")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                .content(objectMapper.writeValueAsString(orderRequestDto))
         );
 
         perform.andDo(print()).andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.data", equalTo(null)))
-                .andExpect(jsonPath("$.errorMessage[0]", equalTo("PRODUCT ID IS ALREADY EXISTS")))
+                .andExpect(jsonPath("$.message", equalTo(ErrorCode.PRODUCT_ID_ALREADY_EXISTS.getMessage())))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
+        verify(queryCatalogService, times(1)).queryCatalogByProductId(any(RequestOrderForCatalogDto.class));
         verify(commandOrderService, times(1)).createOrder(any(), any(OrderRequestDto.class));
-        verify(commandOrderRepository, never()).save(any(Order.class));
     }
 
     @Test
     void 주문_생성요청_테스트() throws Exception {
-        // given
-        queryOrderService.orderExistsByProductId(productId1);
-        commandOrderRepository.save(order1);
-        OrderResponseDto orderResponseDto = OrderResponseDto.fromEntity(order1);
 
-        when(queryOrderService.orderExistsByProductId(any())).thenReturn(false);
-        when(commandOrderService.createOrder(any(), any(OrderRequestDto.class))).thenReturn(OrderResponseDto.fromEntity(order1));
-        when(commandOrderRepository.save(any(Order.class))).thenReturn(order1);
+        when(queryCatalogService.queryCatalogByProductId(any(RequestOrderForCatalogDto.class))).thenReturn(responseOrderForCatalogDto);
+        when(commandOrderService.createOrder(any(), any(OrderRequestDto.class))).thenReturn(orderResponseDto);
+
         // when
         ResultActions perform = mockMvc.perform(post("/api/v1/order/" + userId1 + "/orders")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -155,9 +137,7 @@ public class CommandOrderControllerTest {
                 .andExpect(jsonPath("$.data.orderId", equalTo(orderResponseDto.getOrderId())))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
-        verify(queryOrderService, times(1)).orderExistsByProductId(any());
+        verify(queryCatalogService, times(1)).queryCatalogByProductId(any(RequestOrderForCatalogDto.class));
         verify(commandOrderService, times(1)).createOrder(any(), any(OrderRequestDto.class));
-        verify(commandOrderRepository, times(1)).save(any(Order.class));
-
     }
 }

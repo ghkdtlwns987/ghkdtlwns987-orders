@@ -8,7 +8,6 @@ import com.ghkdtlwns987.order.Exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.rmi.ServerException;
@@ -16,7 +15,7 @@ import java.rmi.ServerException;
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class CatalogValication {
+public class CatalogValidation {
     private final QueryCatalog queryCatalog;
     @Before("execution(* com.ghkdtlwns987.order.Service.Inter.CommandOrderService.createOrder(..)) " + "&& args(userId, orderRequestDto)")
     private void createOrderValidation(String userId, OrderRequestDto orderRequestDto) throws ServerException {

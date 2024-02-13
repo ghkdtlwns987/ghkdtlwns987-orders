@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ghkdtlwns987.order.Catalog.Config.CatalogConfig;
 import com.ghkdtlwns987.order.Catalog.Dto.ResponseOrderForCatalogDto;
-import com.ghkdtlwns987.order.Exception.Class.ProductIdNotExistsException;
 import com.ghkdtlwns987.order.Exception.ClientException;
 import com.ghkdtlwns987.order.Exception.ErrorCode;
 import com.ghkdtlwns987.order.Global.ResultListResponse;

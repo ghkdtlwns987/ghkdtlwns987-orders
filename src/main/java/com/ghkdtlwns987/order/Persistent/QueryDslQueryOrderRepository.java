@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @Repository
+@RequiredArgsConstructor
 public class QueryDslQueryOrderRepository implements QueryOrderRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
