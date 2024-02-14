@@ -3,6 +3,7 @@ package com.ghkdtlwns987.order.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -36,6 +37,7 @@ public class Order {
 
     @Column(name = "orderedAt", nullable = false, updatable = false)
     @CreationTimestamp
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private LocalDateTime orderAt;
 
     @Builder
